@@ -117,10 +117,6 @@ public class Bankingapp {
                         System.out.println("Enter the Valid Choice");
                         break;
                 }
-
-
-
-
             }
         }
         catch (Exception e)
