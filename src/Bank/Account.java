@@ -19,7 +19,9 @@ public class Account {
         this.sc = sc;
     }
 
-    public long open_account(String email) {
+    public long open_account(String email)
+    {
+
         if (!this.accountExist(email)) {
             this.sc.nextLine();
             System.out.println("Enter the  full name:");

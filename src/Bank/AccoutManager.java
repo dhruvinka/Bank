@@ -30,7 +30,7 @@ public class AccoutManager {
             cn.setAutoCommit(false);
             if (a_number!=0)
             {
-                PreparedStatement pr=cn.prepareStatement("select * from account where pass=?");
+                PreparedStatement pr=cn.prepareStatement("select * from account where pin=?");
                 pr.setString(1,pass);
                 ResultSet rs=pr.executeQuery();
 
@@ -82,31 +82,36 @@ public class AccoutManager {
             cn.setAutoCommit(false);
             if (a_number!=0)
             {
-                PreparedStatement pr=cn.prepareStatement("select * from account where pass=? and a_number=?");
+                PreparedStatement pr=cn.prepareStatement("select * from account where pin=? and a_number=?");
                 pr.setString(1,pass);
                 pr.setLong(2,a_number);
                 ResultSet rs=pr.executeQuery();
 
                 if (rs.next())
                 {
-                    String q="update account set balance=balance - ? where a_number=?";
-                    PreparedStatement pr1=cn.prepareStatement(q);
-                    pr1.setDouble(1,amount);
-                    pr1.setLong(2,a_number);
-                    int res=pr1.executeUpdate();
+                    double current_blance=rs.getDouble("balance");
+                    if(amount<=current_blance ) {
 
-                    if (res > 0)
-                    {
-                        System.out.println("sucessful to debited amount");
-                        cn.commit();
-                        cn.setAutoCommit(true);
-                        return;
+                        String q = "update account set balance=balance - ? where a_number=?";
+                        PreparedStatement pr1 = cn.prepareStatement(q);
+                        pr1.setDouble(1, amount);
+                        pr1.setLong(2, a_number);
+                        int res = pr1.executeUpdate();
+
+                        if (res > 0) {
+                            System.out.println("sucessful to debited amount");
+                            cn.commit();
+                            cn.setAutoCommit(true);
+                            return;
+                        } else {
+                            System.out.println("failed");
+                            cn.rollback();
+                            cn.setAutoCommit(true);
+                        }
                     }
                     else
                     {
-                        System.out.println("failed");
-                        cn.rollback();
-                        cn.setAutoCommit(true);
+                        System.out.println("less then the avalabe balance");
                     }
 
                 }
@@ -180,7 +185,7 @@ public class AccoutManager {
             cn.setAutoCommit(false);
             if (a_number!=0 && rs_number !=0)
             {
-                PreparedStatement pr=cn.prepareStatement("select * from account where a_number=? and pass=?");
+                PreparedStatement pr=cn.prepareStatement("select * from account where a_number=? and pin=?");
                 pr.setLong(1,a_number);
                 pr.setString(2,pass);
 
@@ -197,14 +202,14 @@ public class AccoutManager {
 
                         PreparedStatement pr1=cn.prepareStatement(q);
                         PreparedStatement pr2=cn.prepareStatement(q2);
-                        pr1.setDouble(1,a_number);
-                        pr1.setLong(2, Long.parseLong(pass));
+                        pr1.setDouble(1,amount);
+                        pr1.setLong(2, a_number);
                         int res=pr1.executeUpdate();
 
 
-                        pr1.setDouble(1,a_number);
-                        pr1.setLong(2, (rs_number));
-                        int res1=pr1.executeUpdate();
+                        pr2.setDouble(1,amount);
+                        pr2.setLong(2, rs_number);
+                        int res1=pr2.executeUpdate();
 
                         if (res > 0 && res1 > 0)
                         {
